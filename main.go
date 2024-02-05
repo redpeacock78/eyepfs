@@ -140,6 +140,8 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	// Set the Content-Type header
 	w.Header().Set("Content-Type", contentType)
 
+  w.Header().Set("Cache-Control", "public, max-age=315360000")
+
 	_, _ = w.Write(buffer)
 
 	_, _ = io.Copy(w, resp.Body)
