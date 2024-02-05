@@ -18,8 +18,6 @@ echo "IPFS Gateway is ready!"
 ipfs config Swarm.ConnMgr.Type "none"
 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin "[\"${ALLOW_ORIGINS}\"]"
 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods "[\"HEAD\", \"GET\", \"OPTIONS\"]"
-ipfs config --json API.HTTPHeaders.Cache-Control "[\"public, max-age=315360000\"]"
-ipfs config --json Gateway.HTTPHeaders.Cache-Control "[\"public, max-age=315360000\"]"
 
 ipfs config --json show
 
