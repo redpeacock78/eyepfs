@@ -9,6 +9,7 @@ API_KEY="${API_KEY:?API_KEY is required}"
 [ -z "${API_KEY}" ] && echo "API_KEY is required" && exit 1
 
 echo "Starting IPFS Gateway..."
+rm -rf /root/.ipfs/repo.lock
 ipfs init
 ipfs daemon &
 sleep 3
