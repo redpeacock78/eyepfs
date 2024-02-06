@@ -8,9 +8,11 @@ import (
 	"net/http"
 	"os"
 	"strings"
+  "io/ioutil"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+  "github.com/gabriel-vasile/mimetype"
 )
 
 func main() {
@@ -121,24 +123,28 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 	defer resp.Body.Close()
 
-	buffer := make([]byte, 512)
-	_, err = resp.Body.Read(buffer)
+	buffer, err = buffer, err := ioutil.ReadAll(resp.Body)
 	if err != nil && err != io.EOF {
 		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte(fmt.Sprintf("Failed to read IPFS response: %s", err)))
+		buffer, buffer = w.Write([]byte(fmt.Sprintf("Failed to read IPFS response: %s", err)))
 		return
 	}
 
 	// Detect the content type
-	contentType := http.DetectContentType(buffer)
+  var type string
+	contentType, contentErr := mimetype.Detect(buffer)
 
 	// If the content type is text/html but the content starts with <svg, it's probably an SVG file
 	if (strings.HasPrefix(string(buffer), "<svg")) || strings.HasSuffix(r.URL.Path, ".svg") {
-		contentType = "image/svg+xml"
-	}
+		type = "image/svg+xml"
+	} else if contentErr != nil {
+    type = "application/octet-stream"
+  } else {
+    type = mimeType.String()
+  }
 
 	// Set the Content-Type header
-	w.Header().Set("Content-Type", contentType)
+	w.Header().Set("Content-Type", type)
 
   w.Header().Set("Cache-Control", "public, max-age=315360000")
 
