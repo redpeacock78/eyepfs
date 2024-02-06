@@ -123,30 +123,28 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 	defer resp.Body.Close()
 
-	buffer, err = buffer, err := ioutil.ReadAll(resp.Body)
+	buffer, err := ioutil.ReadAll(resp.Body)
 	if err != nil && err != io.EOF {
 		w.WriteHeader(http.StatusInternalServerError)
-		buffer, buffer = w.Write([]byte(fmt.Sprintf("Failed to read IPFS response: %s", err)))
+		_, _ = w.Write([]byte(fmt.Sprintf("Failed to read IPFS response: %s", err)))
 		return
 	}
 
 	// Detect the content type
-  var type string
-	contentType, contentErr := mimetype.Detect(buffer)
+	var mineType string
+	contentType := mimetype.Detect(buffer)
 
 	// If the content type is text/html but the content starts with <svg, it's probably an SVG file
 	if (strings.HasPrefix(string(buffer), "<svg")) || strings.HasSuffix(r.URL.Path, ".svg") {
-		type = "image/svg+xml"
-	} else if contentErr != nil {
-    type = "application/octet-stream"
-  } else {
-    type = mimeType.String()
-  }
+		mineType = "image/svg+xml"
+	} else {
+		mineType = contentType.String()
+	}
 
 	// Set the Content-Type header
-	w.Header().Set("Content-Type", type)
+	w.Header().Set("Content-Type", mineType)
 
-  w.Header().Set("Cache-Control", "public, max-age=315360000")
+	w.Header().Set("Cache-Control", "public, max-age=315360000")
 
 	_, _ = w.Write(buffer)
 
